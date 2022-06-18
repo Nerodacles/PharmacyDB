@@ -1,0 +1,36 @@
+version: '3.8'
+services:
+  mongodb:
+    image: mongo:latest # use the latest image.
+    container_name: PharmacyDB
+    networks:
+      - pharmacyapp
+    restart: unless-stopped
+    environment: # set required env variables to access mongo
+      MONGO_INITDB_ROOT_USERNAME: pharmacy
+      MONGO_INITDB_ROOT_PASSWORD: ${dbpassword}
+    # ports:
+    #   - 27017:27017
+    volumes: # optional to preserve database after container is deleted.
+      - ./database-data:/data/db
+  
+  # Mongo Express Service
+  mongo-express:
+    image: mongo-express:0.54.0 # latest image
+    container_name: PharmacyDB-express
+    hostname: PharmacyDB
+    networks:
+      - pharmacyapp
+    restart: unless-stopped
+    ports:
+      - 8086:8081
+    environment:
+      ME_CONFIG_MONGODB_ADMINUSERNAME: pharmacy
+      ME_CONFIG_MONGODB_ADMINPASSWORD: ${dbpassword}
+      ME_CONFIG_MONGODB_SERVER: PharmacyDB
+      # use the name of the mongo container above for server env var.
+      # In our case this is mongodb
+
+networks:
+  pharmacyapp:
+    external: true
